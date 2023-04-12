@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   createUserDocumentFromAuth,
   signInAuthWithEmailAndPassword,
@@ -7,6 +7,7 @@ import {
 import FormInput from '../form-input/form-input.component';
 import './sign-in-form.styles.scss';
 import Button from '../button/button.component';
+import { UserContext } from '../../contexts/user.context';
 
 const defaultFormFields = {
   email: '',
@@ -16,6 +17,8 @@ const defaultFormFields = {
 function SignInForm() {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
+
+  const { setCurrentUser } = useContext(UserContext);
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
@@ -30,8 +33,8 @@ function SignInForm() {
     event.preventDefault();
 
     try {
-      const response = await signInAuthWithEmailAndPassword(email, password);
-      console.log(response);
+      const { user } = await signInAuthWithEmailAndPassword(email, password);
+      setCurrentUser(user);
       resetFormFields();
     } catch (err) {
       if (err.code === 'auth/user-not-found') {
@@ -48,7 +51,7 @@ function SignInForm() {
 
   return (
     <div className="sign-up-container">
-      <h2>Alreadyhave an account?</h2>
+      <h2>Already have an account?</h2>
       <span>Sign in with your email and password</span>
       <form onSubmit={handleSubmit}>
         <FormInput
